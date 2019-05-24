@@ -148,7 +148,7 @@ def create():
 		a[i]=p
 		f(p)
 	return()
-# create()
+ create()
 
 
 #Q3.Implement YPuzzle class
@@ -229,7 +229,7 @@ def make_rand_ypuzzle():
 
 	initpuzzle = (1,2,3,4,5,6,7,8,0)
 	randPuzzle=YPuzzle(initpuzzle)
-	for i in range(random.randint(0,5000)):
+	for i in range(random.randint(0,50000)):
 		direction = randPuzzle.actions(randPuzzle.initial)
 		actionNumber = random.randint(0,len(direction)-1)
 		nState = randPuzzle.result(randPuzzle.initial,direction[actionNumber])
@@ -263,7 +263,7 @@ def displayY(state):
 
 
 
-#Create a Manhattan function for YPuzzle
+#Create a Manhattan function for YPuzzle using modified row/column function from above
 def Yrow(x):
 	p=0
 	if x<=2 :
@@ -285,7 +285,6 @@ def Ycol(x):
 	else:
 		p=3
 	return p
-
 def h4(puzzle):
 	a=[0]*12
 	x=0
@@ -293,6 +292,11 @@ def h4(puzzle):
 	for i in range(9):
 		if puzzle.state[i]!=b[i] and puzzle.state[i]!=0:
 			a[i]=abs(Yrow(puzzle.state[i])-Ycol(i+1))+abs(Yrow(puzzle.state[i])-Ycol(i+1))
+	#The two cases where the row/column function does not work is when 1 is in the place of 2 and vice versa
+	if puzzle.state[0]==b[1]:
+		a[0]+=2
+	if puzzle.state[1]==b[2]:
+		a[1]+=2
 	return sum(a)
 
 #Function that uses maximum of Misplaced tiles and Manhattan function
@@ -341,4 +345,3 @@ def ycreate():
 	return()
 
 ycreate()
-
