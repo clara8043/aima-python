@@ -2,6 +2,7 @@
 
 from search import *
 import numpy as np
+import random
 # ...
 #Question 1. make Random 8 Puzzle and display the state
 def make_rand_8puzzle(): # makes random 8 puzzle
@@ -10,34 +11,33 @@ def make_rand_8puzzle(): # makes random 8 puzzle
 		p=EightPuzzle(lst)
 		if p.check_solvability(p.initial): #return the puzzle only if solvable
 			break
-	# s = (5,1,6,2,0,3,7,4,8)
-	# p = EightPuzzle(s)
 	return p
 
 #Question 1. prints a readable representation of an eightpuzzle
 def display(state): 
-	r1 =""
-	r2 = ""
-	r3=""
+	s1 =""
+	s2 = ""
+	s3=""
 	for i in range(9):
 		if(i <= 2):
 
 			if(state[i] != 0):
-				r1 += str(state[i]) + " "
+				s1 += str(state[i]) + " "
 			else:
-				r1 += "* "
+				s1 += "* "
 		elif(i>2 and i <=5 ):
 			if(state[i] != 0):
-				r2 += str(state[i]) + " "
+				s2 += str(state[i]) + " "
 			else:
-				r2 += "* "
+				s2 += "* "
 		else:
 			if(state[i] != 0):
-				r3 += str(state[i]) + " "
+				s3 += str(state[i]) + " "
 			else:
-				r3 += "* "
-	print(r1 + "\n" + r2 + "\n" + r3)
+				s3 += "* "
+	print(s1 + "\n" + s2 + "\n" + s3)
 	return()
+
 #Question2. create Misplaced tiles puzzle
 def h1(puzzle):
 	x=0
@@ -100,10 +100,8 @@ def best_first_graph_search1(problem, f):
         node = frontier.pop()
         count+=1
         if problem.goal_test(node.state):
-        	#The print function below outputs the total number of nodes removed from frontier
-        	#This prints while running astar_search1 below 
-        	print('the total number of nodes that were removed from the frontier : '+str(count))
-        	return node
+        	#
+        	return (count,node.depth)
         explored.add(node.state)
         for child in node.expand(problem):
             if child.state not in explored and child not in frontier:
@@ -118,44 +116,49 @@ def best_first_graph_search1(problem, f):
 import time
 def f(p):
    start_time = time.time()
-
    # ... do something ...
    #Runs Misplaced Tile Function astar search and records time
-   astar_search1(p,h1)
+   a1=astar_search1(p,h1)
    elapsed_time = time.time() - start_time
    print(f'elapsed time for h1(in seconds): {elapsed_time}')
+   print('The total number of nodes removed : '+str(a1[0]))
+   print('The length of the solution : '+str(a1[1])+'\n')
 
    #Runs Manhattan Function for astar search and records time
-   astar_search1(p,h2)
+   start_time = time.time()
+   a1=astar_search1(p,h2)
    elapsed_time = time.time() - start_time
    print(f'elapsed time for h2 (in seconds): {elapsed_time}')
+   print('The total number of nodes removed : '+str(a1[0]))
+   print('The length of the solution : '+str(a1[1])+'\n')
    
    #Runs Max of h1 and h2 for astar search and records time
-   astar_search1(p,h3)
+   start_time = time.time()
+   a1=astar_search1(p,h3)
    elapsed_time = time.time() - start_time
    print(f'elapsed time for h3(in seconds): {elapsed_time}')
-   #prints the length of the solution
-   print('Length of the solution is :'+len(p.solution()))
+   print('The total number of nodes removed : '+str(a1[0]))
+   print('The length of the solution : '+str(a1[1])+'\n')
    return()
 #This creates ten random Eight Puzzles and runs astar on each of them
 def create():
-	a=[0]*9
+	a=[0]*10
 	for i in range (10):
 		p=make_rand_8puzzle()
 		a[i]=p
 		f(p)
 	return()
-create()
+# create()
 
 
 #Q3.Implement YPuzzle class
 class YPuzzle(Problem):
 
-    """ The problem of sliding tiles numbered from 1 to 8 on a 3x3 board,
+    """ The problem of sliding tiles numbered from 1 to 8 on a Y puzzle,
     where one of the squares is a blank. A state is represented as a tuple of length 9,
     where element at index i represents the tile number  at index i (0 if it's an empty square) """
  
-    def __init__(self, initial, goal=(1,-1, 2, 3, 4, 5, 6, 7, 8,-1, 0,-1)):
+    def __init__(self, initial, goal=(1, 2, 3, 4, 5, 6, 7, 8, 0)):
         """ Define goal state and initialize a problem """
 
         self.goal = goal
@@ -165,58 +168,177 @@ class YPuzzle(Problem):
         """Return the index of the blank square in a given state"""
 
         return state.index(0)
-    
+    #Modified the possible actions from 8puzzle class
     def actions(self, state):
         """ Return the actions that can be executed in the given state.
         The result would be a list, since there are only four possible actions
         in any given state of the environment """
         
-        possible_actions = ['UP', 'DOWN', 'LEFT', 'RIGHT']       
+        possible_actions = ['UP', 'DOWN', 'LEFT', 'RIGHT','UP2','DOWN2']       
         index_blank_square = self.find_blank_square(state)
 
-        if index_blank_square % 3 == 0:
-            possible_actions.remove('LEFT')
-        if index_blank_square < 3:
-            possible_actions.remove('UP')
-        if index_blank_square % 3 == 2:
-            possible_actions.remove('RIGHT')
-        if index_blank_square > 5:
-            possible_actions.remove('DOWN')
+        if index_blank_square==0:
+        	possible_actions = ['DOWN2']
+        elif index_blank_square==1:
+        	possible_actions = ['DOWN']
+        elif index_blank_square==2:
+        	possible_actions = ['DOWN','UP2','RIGHT']
+        elif index_blank_square==3:
+        	possible_actions = ['DOWN','RIGHT','LEFT']
+        elif index_blank_square==4:
+        	possible_actions = ['DOWN','UP','LEFT']
+        elif index_blank_square==5:
+        	possible_actions = ['UP','RIGHT']
+        elif index_blank_square==6:
+        	possible_actions = ['DOWN2','UP','LEFT','RIGHT']
+        elif index_blank_square==7:
+        	possible_actions = ['UP','LEFT']	
+        elif index_blank_square==8:
+        	possible_actions = ['UP2']
 
         return possible_actions
-
+    #Modified results from 8puzzle class
     def result(self, state, action):
         """ Given state and action, return a new state that is the result of the action.
         Action is assumed to be a valid action in the state """
 
         # blank is the index of the blank square
         blank = self.find_blank_square(state)
-        new_state = list(state)
+        strgs = list(state)
 
-        delta = {'UP':-3, 'DOWN':3, 'LEFT':-1, 'RIGHT':1}
+        delta = {'UP':-3, 'DOWN':3, 'LEFT':-1, 'RIGHT':1, 'DOWN2':2,'UP2':-2}
         neighbor = blank + delta[action]
-        new_state[blank], new_state[neighbor] = new_state[neighbor], new_state[blank]
+        strgs[blank], strgs[neighbor] = strgs[neighbor], strgs[blank]
 
-        return tuple(new_state)
+        return tuple(strgs)
 
     def goal_test(self, state):
         """ Given a state, return True if state is a goal state or False, otherwise """
 
         return state == self.goal
 
-    def check_solvability(self, state):
-        """ Checks if the given state is solvable """
-
-        inversion = 0
-        for i in range(len(state)):
-            for j in range(i+1, len(state)):
-                if (state[i] > state[j]) and state[i] != 0 and state[j]!= 0:
-                    inversion += 1
-        
-        return inversion % 2 == 0
-    
     def h(self, node):
         """ Return the heuristic value for a given state. Default heuristic function used is 
         h(n) = number of misplaced tiles """
 
         return sum(s != g for (s, g) in zip(node.state, self.goal))
+
+#Implement making random y puzzle function
+#Created Puzzles that are solvable instead of creating another solvability function
+def make_rand_ypuzzle():
+
+	initpuzzle = (1,2,3,4,5,6,7,8,0)
+	randPuzzle=YPuzzle(initpuzzle)
+	for i in range(random.randint(0,5000)):
+		direction = randPuzzle.actions(randPuzzle.initial)
+		actionNumber = random.randint(0,len(direction)-1)
+		nState = randPuzzle.result(randPuzzle.initial,direction[actionNumber])
+		randPuzzle = YPuzzle(nState)
+	return randPuzzle
+
+
+#Function to display current state of ypuzzle
+def displayY(state): 
+	s1 =""
+	s2 = ""
+	s3 = ""
+	s4 = ""
+	strgs = ['']*9
+	for i in range(9):
+		if i==state.index(0):
+			strgs[i]='*'
+		else:
+			strgs[i]=str(state[i])
+	for i in range(9):
+		if i<2:
+			s1+=strgs[i]+"   "
+		elif i>=2 and i<5:
+			s2+=strgs[i]+" "
+		elif i>=5 and i<8:
+			s3+=strgs[i]+" "
+		else:
+			s4+="  " +strgs[i]
+	print(s1 + "\n" + s2 + "\n" + s3 + "\n" + s4)
+	return()
+
+
+
+#Create a Manhattan function for YPuzzle
+def Yrow(x):
+	p=0
+	if x<=2 :
+		p=1
+	elif x<=5 :
+		p=2
+	elif x<=8 :
+		p=3
+	else : 
+		p=4
+	return p
+
+def Ycol(x):
+	p=0
+	if x==1 or x==3 or x==6:
+		p=1
+	elif x==4 or x==7 or x==0:
+		p=2
+	else:
+		p=3
+	return p
+
+def h4(puzzle):
+	a=[0]*12
+	x=0
+	b=(1,2,3,4,5,6,7,8,0)
+	for i in range(9):
+		if puzzle.state[i]!=b[i] and puzzle.state[i]!=0:
+			a[i]=abs(Yrow(puzzle.state[i])-Ycol(i+1))+abs(Yrow(puzzle.state[i])-Ycol(i+1))
+	return sum(a)
+
+#Function that uses maximum of Misplaced tiles and Manhattan function
+def h5(puzzle):
+	if h1(puzzle)>h4(puzzle):
+		return h1(puzzle)
+	else:
+		return h4(puzzle)
+
+#This creates twenty random Y Puzzles and runs astar on each of them
+
+
+def fy(p):
+   start_time = time.time()
+   # ... do something ...
+   #Runs Misplaced Tile Function astar search and records time
+   a1=astar_search1(p,h1)
+   elapsed_time = time.time() - start_time
+   print(f'elapsed time for h1(in seconds): {elapsed_time}')
+   print('The total number of nodes removed : '+str(a1[0]))
+   print('The length of the solution : '+str(a1[1])+'\n')
+
+   #Runs Manhattan Function for astar search and records time
+   start_time = time.time()
+   a1=astar_search1(p,h4)
+   elapsed_time = time.time() - start_time
+   print(f'elapsed time for h4 (in seconds): {elapsed_time}')
+   print('The total number of nodes removed : '+str(a1[0]))
+   print('The length of the solution : '+str(a1[1])+'\n')
+   
+   #Runs Max of h1 and h4 for astar search and records time
+   start_time = time.time()
+   a1=astar_search1(p,h5)
+   elapsed_time = time.time() - start_time
+   print(f'elapsed time for h5(in seconds): {elapsed_time}')
+   print('The total number of nodes removed : '+str(a1[0]))
+   print('The length of the solution : '+str(a1[1])+'\n')
+   return()
+
+def ycreate():
+	a=[0]*20
+	for i in range (20):
+		p=make_rand_ypuzzle()
+		a[i]=p
+		fy(p)
+	return()
+
+ycreate()
+
