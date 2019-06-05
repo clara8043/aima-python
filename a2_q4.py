@@ -1,7 +1,12 @@
 from a2_q2 import *
 import time #to find the elapsed time
 
-#For Q4, We use the child class of CSP which is CSP_MOD by importing this class from a2_q3 file
+#USED MODIFIED VERSION OF CSP : CREATED AN INHERITANCE OF CSP CALLED CSP_MOD IN a2_q2.py
+#CREATED IN Q2 FILE BECAUSE OF EFFICIENCY OF USAGE
+#CSP_MOD INCLUDES ONE MORE MEMBER self.unassigns TO COUNT THE UNASSIGNED CSP VARIABLES WHILE LOOKING FOR A SOLUTION
+#THUS IT INCREMENTS IN FUNCTION unassign IN THE CLASS
+#MapColoringCSP_MOD	ENSURES THAT WE USE THE ABOCE CSP_MOD FOR MAPC COLOURING
+
 #We use the min_conflicts function to approximate the number of groups we can make. This function takes input CSP_MOD
 
 

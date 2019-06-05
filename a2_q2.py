@@ -9,6 +9,8 @@ def check_teams(graph, csp_sol):
 				return False
 	return True
 
+#THE BELOW TWO FUNCTIONS ARE USED TO IMPLEMENT IN A2_Q3 AND A2_Q4 FILES
+#THESE ARE IMPLEMENTED HERE BECAUSE OF EFFICIENCY IN CODE SINCE BOTH Q3 AND Q4 IMPORTS Q2
 #Child class of CSP that includes self.unassigns and iniitializes it to 0
 class CSP_MOD(CSP):
 

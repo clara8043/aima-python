@@ -94,6 +94,7 @@ def q3_excel_sheet():
 			# ... do something ...
 			a=0 #counter for times CSP variables were assigned
 			ua=0 #counter for times CSP variables were unassigned
+			lasta=0
 			for j in range(30):
 				mccsp=MapColoringCSP_MOD(range(0,j),graphs[i])
 
@@ -104,6 +105,7 @@ def q3_excel_sheet():
 
 			#Check if the constraints are satisfied when backtracking search algorithm has found a solution
 				if check_teams(graphs[i],bcksrch)==True and bcksrch!=None:
+					lasta=mccsp.nassigns
 					break	
 		
 			elapsed_time = time.time() - start_time
@@ -126,7 +128,7 @@ def q3_excel_sheet():
 			sCol+=1
 			insert_into_cell(sRow,sCol,max(alist)+1)
 			sCol+=1
-			insert_into_cell(sRow,sCol,mccsp.nassigns)
+			insert_into_cell(sRow,sCol,lasta)
 			sCol=1
 			sRow+=1
 			gProb+=0.1
