@@ -12,55 +12,62 @@ sheet = wb.active			# create an active sheet in workbook
 sheet.title = "Assignment2_Question3" # title of the sheet
 
 
-def makegraphs():
-	graphs = [rand_graph(30, 0.1), rand_graph(30, 0.2), rand_graph(30, 0.3), rand_graph(30, 0.4), rand_graph(30, 0.5)]
-	return graphs
+def q4(graphs):
 
-#Make five random graphs then for each graph, we run a backtracking_search using map colouring algorithm for each instances per person
-def q3(graphs):
 	for i in range(5):
 		start_time = time.time()
 		# ... do something ...
 		a=0 #counter for times CSP variables were assigned
-		ua=0 #counter for times CSP variables were unassigned
-		tc=0 # counter for the number of each CSP variables having conflicts with each other
-		last_ua=0 #initialize the number of our last case of unassigned variables
-		last_a=0 #initialize the number of our last case of assigned variables		
-		for j in range(30):
-			mccsp=MapColoringCSP_MOD(range(0,j),graphs[i])
 
-			#Use backtracking search for mccsp and input mrv and forward checking for more efficiency
-			bcksrch=backtracking_search(mccsp,select_unassigned_variable=mrv, inference=forward_checking)
-			a+=mccsp.nassigns #Add the  number of assigns to our total number of assigns in this graph
-			ua+=mccsp.unassigns #Add the number of unassigned CSP Variable to our total number of unassigned variables in this graph
-			tc+=mccsp.totcon #Adds the number of total conflicts of each CSP variable
-			#Check if the constraints are satisfied when backtracking search algorithm has found a solution
-			if check_teams(graphs[i],bcksrch)==True and bcksrch!=None:
-				last_ua=mccsp.unassigns
-				last_a=mccsp.nassigns				
-				break	
+		#ua is a counter for times CSP variables were assigned, however it is not necessary and is always 0 in this case
+		#since min_conflicts does not unassign CSP variables in the process
+		ua=0 #counter for times CSP variables were unassigned
 		
+		tc=0 #counter for total conflict cases
+		last_ua=0 #initialize the number of our last case of unassigned variables
+		last_a=0 #initialize the number of our last case of assigned variables
+		for j in range(100):
+			mccsp=MapColoringCSP_MOD(range(0,j+1),graphs[i])
+			#As the max_steps value input goes up, the elapsed time for running CSP for each graphs increases. 
+			#If max_steps=100000 like the original value in the textbook code, elapsed time becomes around x200 longer than max_steps=1000
+			#However, the larger max_steps are, the closer we get to the exact minimum number of groups
+			mincon=min_conflicts(mccsp,max_steps=1500)
+			a+=mccsp.nassigns
+			ua+=mccsp.unassigns
+			tc+=mccsp.totcon
+			#check if the solution satisfies the constraints and the min_conflicts hill climbing algorithm has fully iterated with a solution
+			if check_teams(graphs[i],mincon)==True and mincon!=None:
+				last_ua=mccsp.unassigns
+				last_a=mccsp.nassigns
+				break
 		elapsed_time = time.time() - start_time
 
 		#calculate the number of teams that people are divided into
-		alist = [0] * len(bcksrch)
-		for k in range(len(bcksrch)):
-			alist[k]=bcksrch[k]
-		print('==========q3========= p== 0.',i+1,'=============================')
-		print('The number of teams that people are divided into : ',max(alist)+1)
+		#allocate all the values from mincon(the solution dictionary) to an empty array in order to use max function 
+		alist = [0] * len(mincon) #create empty array of size of the min_conflicts
+		for k in range(len(mincon)):
+			alist[k]=mincon[k] #The maximum number of this array is the last group number (group number starts from zero)
+
+		#print statistics
+		print('==========q4========= p== 0.',i+1,'=============================')
+		print('The number of teams that people are divided into : ',max(alist)+1) #added 1 since group name starts from zero
 		print(f'elapsed time for exact minimum number(in seconds): {elapsed_time}')
 		print('The total number of times CSP variables were assigned : ',a)
 		print('The total number of times CSP variables were unassigned : ',ua)
 		print('The total number of times CSP variables had conflicts : ',tc)
 		print('The number of assigned variables in our last case : ',last_a)		
-		print('The number of unassigned variables in our last case : ',last_ua)			
-		print('==============================================================\n')
-		
-#CREATE FIVE INSTANCES OF ABOVE Q3 AND OUPTUTS THEM
-def run_q3():
+		print('The number of unassigned variables in our last case : ',last_ua)								
+		print('==================================================================\n')
+
+#makegraphs is a function that produces five random graphs with n=100 and different p values from 0.1 to 0.5
+def makegraphs():
+	graphs = [rand_graph(100, 0.1), rand_graph(100, 0.2), rand_graph(100, 0.3), rand_graph(100, 0.4), rand_graph(100, 0.5)]
+	return graphs
+#CREATE FIVE INSTANCES OF ABOVE q4 AND OUPTUTS THEM
+def run_q4():
 	for i in range(5):
 		print('-------------',i+1,'th iteration--------------------------')
-		q3(makegraphs())
+		q4(makegraphs())
 		print('-------------------------------------------------------\n')
 
 
@@ -69,7 +76,7 @@ def insert_into_cell(r,c,val):
 	c = sheet.cell(row=r,column=c)
 	c.value = val
 
-def q3_excel_sheet():
+def q4_excel_sheet():
 	print('!!!!!! BUILDING EXCEL SHEET .............\n')
 	sRow = 1	# sheet row index (global var)
 	sCol = 1	# sheet column index (global var)
@@ -105,30 +112,36 @@ def q3_excel_sheet():
 			start_time = time.time()
 			# ... do something ...
 			a=0 #counter for times CSP variables were assigned
-			ua=0 #counter for times CSP variables were unassigned
-			tc=0 # counter for the number of each CSP variables having conflicts with each other
-			last_ua=0 #initialize the number of our last case of unassigned variables
-			last_a=0 #initialize the number of our last case of assigned variables		
-			for j in range(30):
-				mccsp=MapColoringCSP_MOD(range(0,j),graphs[i])
 
-				#Use backtracking search for mccsp and input mrv and forward checking for more efficiency
-				bcksrch=backtracking_search(mccsp,select_unassigned_variable=mrv, inference=forward_checking)
-				a+=mccsp.nassigns #Add the  number of assigns to our total number of assigns in this graph
-				ua+=mccsp.unassigns #Add the number of unassigned CSP Variable to our total number of unassigned variables in this graph
-				tc+=mccsp.totcon #Adds the number of total conflicts of each CSP variable
-				#Check if the constraints are satisfied when backtracking search algorithm has found a solution
-				if check_teams(graphs[i],bcksrch)==True and bcksrch!=None:
-					last_ua=mccsp.unassigns
-					last_a=mccsp.nassigns				
-					break	
+			#ua is a counter for times CSP variables were assigned, however it is not necessary and is always 0 in this case
+			#since min_conflicts does not unassign CSP variables in the process
+			ua=0 #counter for times CSP variables were unassigned
 			
+			tc=0 #counter for total conflict cases
+			last_ua=0 #initialize the number of our last case of unassigned variables
+			last_a=0 #initialize the number of our last case of assigned variables
+			for j in range(100):
+				mccsp=MapColoringCSP_MOD(range(0,j+1),graphs[i])
+				#As the max_steps value input goes up, the elapsed time for running CSP for each graphs increases. 
+				#If max_steps=100000 like the original value in the textbook code, elapsed time becomes around x200 longer than max_steps=1000
+				#However, the larger max_steps are, the closer we get to the exact minimum number of groups
+				mincon=min_conflicts(mccsp,max_steps=1500)
+				a+=mccsp.nassigns
+				ua+=mccsp.unassigns
+				tc+=mccsp.totcon
+				#check if the solution satisfies the constraints and the min_conflicts hill climbing algorithm has fully iterated with a solution
+				if check_teams(graphs[i],mincon)==True and mincon!=None:
+					last_ua=mccsp.unassigns
+					last_a=mccsp.nassigns
+					break
 			elapsed_time = time.time() - start_time
 
 			#calculate the number of teams that people are divided into
-			alist = [0] * len(bcksrch)
-			for k in range(len(bcksrch)):
-				alist[k]=bcksrch[k]
+			#allocate all the values from mincon(the solution dictionary) to an empty array in order to use max function 
+			alist = [0] * len(mincon) #create empty array of size of the min_conflicts
+			for k in range(len(mincon)):
+				alist[k]=mincon[k] #The maximum number of this array is the last group number (group number starts from zero)
+
 			insert_into_cell(sRow,sCol,gNum)
 			sCol+=1
 			insert_into_cell(sRow,sCol,30)
@@ -153,8 +166,8 @@ def q3_excel_sheet():
 			gProb+=0.1
 			gNum+=1
 		sRow+=5
-	wb.save('a2_q3.xlsx')
-	print('DATA RECORDED IN "a2_q3.xlsx" IN THE ROOT DIRECTORY !!!!!!')
+	wb.save('a2_q4.xlsx')
+	print('DATA RECORDED IN "a2_q4.xlsx" IN THE ROOT DIRECTORY !!!!!!')
 
-#run_q3()
-q3_excel_sheet()
+#run_q4()
+q4_excel_sheet()

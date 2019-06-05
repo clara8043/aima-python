@@ -17,7 +17,21 @@ class CSP_MOD(CSP):
 	def __init__(self, variables, domains, neighbors, constraints):
 		#MODIFIED to count number of unassignments
 		self.unassigns = 0
+		self.totcon = 0
 		CSP.__init__(self, variables, domains, neighbors, constraints)
+
+	def nconflicts(self, var, val, assignment):
+		"""Return the number of conflicts var=val has with other variables."""
+		# Subclasses may implement this more efficiently
+		def conflict(var2):
+			return (var2 in assignment and
+					not self.constraints(var, val, var2, assignment[var2]))
+
+		#MODIFIED CODE TO COUNT TOTAL NUMBER OF CONFLICTS  
+		k=count(conflict(v) for v in self.neighbors[var])
+		self.totcon+=k
+		return k
+
 	def unassign(self, var, assignment):
 		"""Remove {var: val} from assignment.
 		DO NOT call this if you are changing a variable to a new value;
@@ -25,6 +39,7 @@ class CSP_MOD(CSP):
 		if var in assignment:
 			del assignment[var]
 			self.unassigns+=1
+
 
 #MODIFIED version of textbook MapColouringCSP to ensure we use the CSP_MOD instead of CSP
 def MapColoringCSP_MOD(colors, neighbors):

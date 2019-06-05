@@ -3,23 +3,28 @@ import time #to find the elapsed time
 
 #USED MODIFIED VERSION OF CSP : CREATED AN INHERITANCE OF CSP CALLED CSP_MOD IN a2_q2.py
 #CREATED IN Q2 FILE BECAUSE OF EFFICIENCY OF USAGE
-#CSP_MOD INCLUDES ONE MORE MEMBER self.unassigns TO COUNT THE UNASSIGNED CSP VARIABLES WHILE LOOKING FOR A SOLUTION
-#THUS IT INCREMENTS IN FUNCTION unassign IN THE CLASS
+#CSP_MOD INCLUDES self.unassigns TO COUNT THE UNASSIGNED CSP VARIABLES WHILE LOOKING FOR A SOLUTION
+#CSP_MOD INCLUDES self.totcon TO COUNT THE NUMBER OF CONLFICTS WHILE GETTING TO THE SOLUTION
+
 #MapColoringCSP_MOD	ENSURES THAT WE USE THE ABOCE CSP_MOD FOR MAPC COLOURING
 
 #We use the min_conflicts function to approximate the number of groups we can make. This function takes input CSP_MOD
 
 
-#q4 takes a set of five graphs as input. Then, 
 def q4(graphs):
 
 	for i in range(5):
 		start_time = time.time()
 		# ... do something ...
 		a=0 #counter for times CSP variables were assigned
+
 		#ua is a counter for times CSP variables were assigned, however it is not necessary and is always 0 in this case
 		#since min_conflicts does not unassign CSP variables in the process
 		ua=0 #counter for times CSP variables were unassigned
+
+		tc=0 #counter for total conflict cases
+		last_ua=0 #initialize the number of our last case of unassigned variables
+		last_a=0 #initialize the number of our last case of assigned variables
 		for j in range(100):
 			mccsp=MapColoringCSP_MOD(range(0,j+1),graphs[i])
 			#As the max_steps value input goes up, the elapsed time for running CSP for each graphs increases. 
@@ -28,8 +33,11 @@ def q4(graphs):
 			mincon=min_conflicts(mccsp,max_steps=1500)
 			a+=mccsp.nassigns
 			ua+=mccsp.unassigns
+			tc+=mccsp.totcon
 			#check if the solution satisfies the constraints and the min_conflicts hill climbing algorithm has fully iterated with a solution
 			if check_teams(graphs[i],mincon)==True and mincon!=None:
+				last_ua=mccsp.unassigns
+				last_a=mccsp.nassigns
 				break
 		elapsed_time = time.time() - start_time
 
@@ -41,10 +49,13 @@ def q4(graphs):
 
 		#print statistics
 		print('==========q4========= p== 0.',i+1,'=============================')
-		print('The number of teams people are divided into : ',max(alist)+1) #added 1 since group name starts from zero
+		print('The number of teams that people are divided into : ',max(alist)+1) #added 1 since group name starts from zero
 		print(f'elapsed time for exact minimum number(in seconds): {elapsed_time}')
-		print('The count of number of times CSP variables were assigned : ',a)
-		print('The count of number of times CSP variables were unassigned : ',ua)
+		print('The total number of times CSP variables were assigned : ',a)
+		print('The total number of times CSP variables were unassigned : ',ua)
+		print('The total number of times CSP variables had conflicts : ',tc)
+		print('The number of assigned variables in our last case : ',last_a)		
+		print('The number of unassigned variables in our last case : ',last_ua)								
 		print('==================================================================\n')
 
 #makegraphs is a function that produces five random graphs with n=100 and different p values from 0.1 to 0.5
