@@ -1,38 +1,18 @@
 from a2_q2 import *
 import time #to find the elapsed time
 
+#USED MODIFIED VERSION OF CSP : CREATED AN INHERITANCE OF CSP CALLED CSP_MOD IN a2_q2.py
+#CREATED IN Q2 FILE BECAUSE OF EFFICIENCY OF USAGE
+#CSP_MOD INCLUDES ONE MORE MEMBER self.unassigns TO COUNT THE UNASSIGNED CSP VARIABLES WHILE LOOKING FOR A SOLUTION
+#THUS IT INCREMENTS IN FUNCTION unassign IN THE CLASS
+#MapColoringCSP_MOD	ENSURES THAT WE USE THE ABOCE CSP_MOD FOR MAPC COLOURING
 
-#Child class of CSP that includes self.unassigns and iniitializes it to 0
-class CSP_MOD(CSP):
+def makegraphs():
+	graphs = [rand_graph(30, 0.1), rand_graph(30, 0.2), rand_graph(30, 0.3), rand_graph(30, 0.4), rand_graph(30, 0.5)]
+	return graphs
 
-	def __init__(self, variables, domains, neighbors, constraints):
-		#MODIFIED to count number of unassignments
-		self.unassigns = 0
-		CSP.__init__(self, variables, domains, neighbors, constraints)
-	def unassign(self, var, assignment):
-		"""Remove {var: val} from assignment.
-		DO NOT call this if you are changing a variable to a new value;
-		just call assign for that."""
-		if var in assignment:
-			del assignment[var]
-			self.unassigns+=1
-
-#MODIFIED version of textbook MapColouringCSP to ensure we use the child class of CSP which is CSP_MOD
-def MapColoringCSP_MOD(colors, neighbors):
-	"""Make a CSP for the problem of coloring a map with different colors
-	for any two adjacent regions. Arguments are a list of colors, and a
-	dict of {region: [neighbor,...]} entries. This dict may also be
-	specified as a string of the form defined by parse_neighbors."""
-	if isinstance(neighbors, str):
-		neighbors = parse_neighbors(neighbors)
-	return CSP_MOD(list(neighbors.keys()), UniversalDict(colors), neighbors,
-			   different_values_constraint)
-
-graphs = [rand_graph(30, 0.1), rand_graph(30, 0.2), rand_graph(30, 0.3),
-	rand_graph(30, 0.4), rand_graph(30, 0.5)]
 #Make five random graphs then for each graph, we run a backtracking_search using map colouring algorithm for each instances per person
-def q3():
-
+def q3(graphs):
 	for i in range(5):
 		start_time = time.time()
 		# ... do something ...
@@ -46,9 +26,7 @@ def q3():
 			a+=mccsp.nassigns #Add the  number of assigns to our total number of assigns in this graph
 			ua+=mccsp.unassigns #Add the number of unassigned CSP Variable to our total number of unassigned variables in this graph
 
-			#Check if the constraints are satisfied when backtracking search has finished
-			# if bcksrch!=None and check_teams(graphs[i],bcksrch)==True:
-			# 	break
+			#Check if the constraints are satisfied when backtracking search algorithm has found a solution
 			if check_teams(graphs[i],bcksrch)==True and bcksrch!=None:
 				break	
 		
@@ -58,14 +36,17 @@ def q3():
 		alist = [0] * len(bcksrch)
 		for k in range(len(bcksrch)):
 			alist[k]=bcksrch[k]
-		print('==============================================================')
+		print('==========q3========= p== 0.',i+1,'=============================')
 		print('The number of teams people are divided into : ',max(alist)+1)
 		print(f'elapsed time for exact minimum number(in seconds): {elapsed_time}')
 		print('The count of number of times CSP variables were assigned : ',a)
 		print('The count of number of times CSP variables were unassigned : ',ua)
 		print('==============================================================\n')
-
+		
+#CREATE FIVE INSTANCES OF ABOVE Q3 AND OUPTUTS THEM
 def run_q3():
 	for i in range(5):
-		q3()
-#q3()
+		print('-------------',i+1,'th iteration--------------------------')
+		q3(makegraphs())
+		print('-------------------------------------------------------\n')
+run_q3()
